@@ -10,6 +10,39 @@ MIN_TIME = 3
 MAX_USAGE = 15
 MODEL = "meta-llama/Llama-3.2-1B-Instruct"
 
+### You can use this to load a model locally and then use it for the chatbot than using API
+"""
+from transformers import AutoModelForCausalLM, AutoTokenizer
+import torch
+
+model_id = "meta-llama/Llama-3.2-1B-Instruct"
+
+# Load tokenizer
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+
+# Load model (fp16 if GPU available, else fallback to CPU)
+model = AutoModelForCausalLM.from_pretrained(
+    model_id,
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+    device_map="auto"  # auto-choose CPU/GPU
+)
+
+# Encode prompt
+prompt = "Write a short story about a kid exploring space."
+inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+
+# Generate
+outputs = model.generate(
+    **inputs,
+    max_new_tokens=100,
+    do_sample=True,
+    temperature=0.7,
+    top_p=0.9
+)
+
+print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+
+"""
 
 MODEL_PROMPT = {"role": "system", "content": "You are WAVES, A friendly chatbot that is being used by a website for explaining Solar weather to people as easy as possible, Your goal is to be as explanatory as possible while ignoring or rejecting any unrelated question"}
 
