@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Space Weather Explained</title>
+    <title>Space Weather Portal - Real-Time Data</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            color: #fff;
+            color: #e0e0e0;
+            background: #000;
             position: relative;
             min-height: 100vh;
         }
@@ -40,13 +41,38 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(10, 14, 39, 0.7);
+            background: radial-gradient(ellipse at center, rgba(10, 10, 30, 0.8) 0%, rgba(0, 0, 10, 0.95) 100%);
             z-index: -1;
+        }
+
+        /* Stars animation */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         /* Main Website Styles */
         .main-content {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
             position: relative;
@@ -56,67 +82,145 @@
         header {
             text-align: center;
             margin-bottom: 60px;
-            padding: 40px 20px;
-            background: rgba(30, 60, 114, 0.7);
-            backdrop-filter: blur(10px);
+            padding: 50px 20px;
+            background: rgba(15, 15, 35, 0.6);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(100, 120, 200, 0.3);
+            box-shadow: 0 0 40px rgba(100, 120, 255, 0.15),
+                        inset 0 0 40px rgba(100, 120, 255, 0.05);
+            animation: headerPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes headerPulse {
+            0%, 100% { 
+                box-shadow: 0 0 40px rgba(100, 120, 255, 0.15), inset 0 0 40px rgba(100, 120, 255, 0.05);
+                border-color: rgba(100, 120, 200, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 60px rgba(100, 120, 255, 0.25), inset 0 0 50px rgba(100, 120, 255, 0.1);
+                border-color: rgba(120, 140, 220, 0.5);
+            }
         }
 
         header h1 {
-            font-size: 48px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-size: 56px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #a8c0ff 0%, #6e88ff 50%, #4a5fff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(100, 120, 255, 0.5);
+            letter-spacing: 3px;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
         }
 
         header p {
-            font-size: 18px;
-            opacity: 0.9;
-            max-width: 800px;
+            font-size: 16px;
+            opacity: 0.85;
+            max-width: 900px;
             margin: 0 auto;
-            line-height: 1.6;
+            line-height: 1.8;
+            color: #b0c4de;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(15, 15, 35, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 120, 200, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(100, 120, 255, 0.1);
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-item .label {
+            font-size: 12px;
+            color: #8090c0;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-item .value {
+            font-size: 26px;
+            color: #a8c0ff;
+            text-shadow: 0 0 15px rgba(100, 120, 255, 0.5);
+            font-weight: 600;
         }
 
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 15, 35, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(100, 120, 200, 0.3);
             border-radius: 15px;
             padding: 30px;
-            transition: transform 0.3s ease;
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(100, 120, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 40px rgba(100, 120, 255, 0.3);
+            border-color: rgba(120, 140, 220, 0.6);
         }
 
         .card h2 {
             font-size: 24px;
-            margin-bottom: 15px;
-            color: #667eea;
+            margin-bottom: 18px;
+            color: #a8c0ff;
             display: flex;
             align-items: center;
+            text-shadow: 0 0 10px rgba(100, 120, 255, 0.3);
+            letter-spacing: 1px;
         }
 
         .card h2 span {
-            margin-right: 10px;
+            margin-right: 12px;
+            font-size: 28px;
         }
 
         .card p {
-            line-height: 1.6;
+            line-height: 1.8;
             opacity: 0.9;
             margin-bottom: 15px;
+            color: #c0d0e0;
         }
 
         .card ul {
@@ -125,21 +229,77 @@
         }
 
         .card li {
-            margin-bottom: 8px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            line-height: 1.7;
+            color: #b0c0d0;
+            position: relative;
+            padding-left: 5px;
+        }
+
+        .card li::marker {
+            color: #7090ff;
         }
 
         .card .fact-box {
-            background: rgba(102, 126, 234, 0.1);
-            border-left: 4px solid #667eea;
-            padding: 15px;
+            background: rgba(100, 120, 200, 0.1);
+            border-left: 3px solid #6e88ff;
+            padding: 18px;
             margin-top: 15px;
-            border-radius: 4px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(100, 120, 255, 0.05);
         }
 
         .card .fact-box h4 {
-            color: #a8b1ff;
-            margin-bottom: 5px;
+            color: #a8c0ff;
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .card .fact-box p {
+            color: #b0c0d0;
+            font-size: 14px;
+        }
+
+        /* Compact Audio Player */
+        .audio-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(100, 120, 200, 0.3);
+            padding: 12px 15px;
+            border-radius: 50px;
+            z-index: 1000;
+            box-shadow: 0 0 25px rgba(100, 120, 255, 0.3);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .player-btn {
+            width: 36px;
+            height: 36px;
+            background: rgba(100, 120, 200, 0.2);
+            border: 1px solid rgba(100, 120, 200, 0.4);
+            color: #a8c0ff;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 50%;
+        }
+
+        .player-btn:hover {
+            background: rgba(100, 120, 200, 0.4);
+            border-color: #6e88ff;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(100, 120, 255, 0.5);
+            transform: scale(1.1);
         }
 
         /* Chat Widget Styles */
@@ -154,10 +314,11 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
+            background: rgba(15, 15, 35, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(100, 120, 200, 0.4);
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 0 25px rgba(100, 120, 255, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -166,13 +327,14 @@
 
         .chat-button:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.8);
+            box-shadow: 0 0 40px rgba(100, 120, 255, 0.6);
+            border-color: #6e88ff;
         }
 
         .chat-button svg {
             width: 30px;
             height: 30px;
-            fill: white;
+            fill: #a8c0ff;
         }
 
         .chat-popup {
@@ -181,10 +343,11 @@
             right: 0;
             width: 400px;
             height: 600px;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 15, 35, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(100, 120, 200, 0.4);
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 50px rgba(100, 120, 255, 0.3);
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -207,24 +370,27 @@
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: rgba(100, 120, 200, 0.2);
+            color: #a8c0ff;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(100, 120, 200, 0.3);
         }
 
         .chat-header h3 {
             font-size: 18px;
             font-weight: 600;
+            text-shadow: 0 0 10px rgba(100, 120, 255, 0.3);
+            letter-spacing: 1px;
         }
 
         .close-btn {
             background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
+            border: 1px solid rgba(100, 120, 200, 0.4);
+            color: #a8c0ff;
+            font-size: 20px;
             cursor: pointer;
             padding: 0;
             width: 30px;
@@ -233,18 +399,20 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(100, 120, 200, 0.3);
+            border-color: #6e88ff;
+            box-shadow: 0 0 15px rgba(100, 120, 255, 0.4);
         }
 
         #chat {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            background: rgba(5, 5, 15, 0.6);
         }
 
         #chat::-webkit-scrollbar {
@@ -252,24 +420,24 @@
         }
 
         #chat::-webkit-scrollbar-track {
-            background: transparent;
+            background: rgba(100, 120, 200, 0.1);
         }
 
         #chat::-webkit-scrollbar-thumb {
-            background: rgba(102, 126, 234, 0.3);
+            background: rgba(100, 120, 200, 0.4);
             border-radius: 10px;
         }
 
         #chat li {
             list-style: none;
             margin-bottom: 12px;
-            padding: 10px 15px;
+            padding: 12px 16px;
             border-radius: 15px;
             max-width: 80%;
             word-wrap: break-word;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 14px;
+            border: 1px solid rgba(100, 120, 200, 0.2);
         }
 
         @keyframes slideIn {
@@ -284,18 +452,17 @@
         }
 
         .user-msg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: rgba(100, 120, 200, 0.25);
+            color: #e0e8ff;
             margin-left: auto;
-            border-bottom-right-radius: 4px;
+            border-color: rgba(100, 120, 200, 0.4);
         }
 
         .server-msg {
-            background: white;
-            color: #333;
+            background: rgba(50, 60, 100, 0.25);
+            color: #c0d0e0;
             margin-right: auto;
-            border-bottom-left-radius: 4px;
-            border: 1px solid #e0e0e0;
+            border-color: rgba(80, 100, 150, 0.3);
         }
 
         .empty-state {
@@ -304,7 +471,7 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: #999;
+            color: #7090c0;
             text-align: center;
         }
 
@@ -313,21 +480,24 @@
             height: 60px;
             margin-bottom: 15px;
             opacity: 0.5;
+            stroke: #a8c0ff;
         }
 
         .empty-state p {
             font-size: 16px;
             margin-bottom: 5px;
+            color: #a8c0ff;
         }
 
         .empty-state small {
             font-size: 12px;
+            color: #8090c0;
         }
 
         .input-area {
             padding: 15px;
-            background: white;
-            border-top: 1px solid #e0e0e0;
+            background: rgba(20, 20, 40, 0.8);
+            border-top: 1px solid rgba(100, 120, 200, 0.3);
             display: flex;
             gap: 10px;
         }
@@ -335,23 +505,29 @@
         #messageInput {
             flex: 1;
             padding: 12px 15px;
-            border: 2px solid #e0e0e0;
+            border: 1px solid rgba(100, 120, 200, 0.3);
+            background: rgba(15, 15, 35, 0.8);
+            color: #e0e8ff;
             border-radius: 20px;
             font-size: 14px;
             outline: none;
             transition: all 0.3s ease;
         }
 
+        #messageInput::placeholder {
+            color: #7090c0;
+        }
+
         #messageInput:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #6e88ff;
+            box-shadow: 0 0 15px rgba(100, 120, 255, 0.3);
         }
 
         .send-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
+            padding: 12px 24px;
+            background: rgba(100, 120, 200, 0.3);
+            color: #a8c0ff;
+            border: 1px solid rgba(100, 120, 200, 0.4);
             border-radius: 20px;
             font-size: 14px;
             font-weight: 600;
@@ -360,11 +536,12 @@
         }
 
         .send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            background: rgba(100, 120, 200, 0.5);
+            border-color: #6e88ff;
+            box-shadow: 0 0 20px rgba(100, 120, 255, 0.4);
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .chat-popup {
                 width: calc(100vw - 40px);
                 height: 500px;
@@ -372,6 +549,15 @@
             
             header h1 {
                 font-size: 36px;
+            }
+
+            .audio-player {
+                bottom: 90px;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -383,109 +569,186 @@
     </div>
     <div class="video-overlay"></div>
 
+    <!-- Stars -->
+    <div class="stars" id="stars"></div>
+
     <!-- Main Website Content -->
     <div class="main-content">
         <header>
-            <h1>🌌 Space Weather Explained</h1>
-            <p>Space weather refers to the environmental conditions in space as influenced by the Sun and the solar wind. Understanding these phenomena helps us protect satellites, power grids, and communication systems on Earth.</p>
+            <h1>🌌 Understanding Space Weather</h1>
+            <p>Space weather refers to the varying conditions in space that are influenced by the Sun's activity. Just as Earth has weather patterns like rain and wind, space has its own "weather" driven by solar phenomena. This comprehensive guide explores the key concepts and impacts of space weather on our planet and technology.</p>
         </header>
+
+        <!-- Key Concepts Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="label">Main Topics</div>
+                <div class="value">8</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Solar Phenomena</div>
+                <div class="value">5</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Earth Impacts</div>
+                <div class="value">4</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Protection Systems</div>
+                <div class="value">6</div>
+            </div>
+        </div>
 
         <div class="content-grid">
             <div class="card">
-                <h2><span>☀️</span> Solar Activity</h2>
-                <p>The Sun is a dynamic star that goes through cycles of activity. Solar activity includes phenomena like:</p>
+                <h2><span>☀️</span> What is Space Weather?</h2>
+                <p>Space weather describes the environmental conditions in Earth's magnetosphere, ionosphere, and thermosphere due to the Sun and the solar wind. Unlike terrestrial weather, space weather occurs in the near-vacuum of space and involves charged particles, magnetic fields, and electromagnetic radiation.</p>
                 <ul>
-                    <li>Sunspots - cooler, darker regions on the Sun's surface</li>
-                    <li>Solar flares - sudden bursts of radiation</li>
-                    <li>Coronal Mass Ejections (CMEs) - massive eruptions of solar material</li>
+                    <li>Origin: Primarily driven by solar activity and variations in the solar wind</li>
+                    <li>Components: Includes electromagnetic radiation, solar energetic particles, and plasma</li>
+                    <li>Duration: Events can last from minutes to several days</li>
+                    <li>Reach: Extends from the Sun's surface to beyond Earth's orbit</li>
+                    <li>Variability: Changes with the 11-year solar cycle and daily solar activity</li>
                 </ul>
-                <p>These events can release enormous amounts of energy and charged particles into space.</p>
+                <p>Space weather affects satellite operations, communications, navigation systems, power grids, and can pose radiation hazards to astronauts and high-altitude aircraft passengers.</p>
                 <div class="fact-box">
-                    <h4>Did You Know?</h4>
-                    <p>A single large solar flare can release more energy than a million volcanic eruptions on Earth.</p>
+                    <h4>KEY CONCEPT</h4>
+                    <p>Space weather is a natural phenomenon that has existed throughout Earth's history, but has become increasingly important as our society relies more on space-based and electronic technologies vulnerable to solar disturbances.</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span>🛰️</span> Satellite Impacts</h2>
-                <p>Space weather can significantly affect satellites in orbit around Earth:</p>
+                <h2><span>🔥</span> Solar Flares</h2>
+                <p>Solar flares are intense bursts of electromagnetic radiation from the Sun's surface. They occur when magnetic energy built up in the solar atmosphere is suddenly released, accelerating particles to nearly the speed of light.</p>
                 <ul>
-                    <li>Increased radiation can damage electronic components</li>
-                    <li>Charged particles can cause electrostatic discharges</li>
-                    <li>Atmospheric drag increases during solar storms, altering orbits</li>
-                    <li>Communication signals can be disrupted or degraded</li>
+                    <li>Classification: Rated by X-ray brightness as A, B, C, M, and X classes (each 10x stronger)</li>
+                    <li>Speed: Radiation reaches Earth in approximately 8 minutes</li>
+                    <li>Energy: Large flares release energy equivalent to millions of nuclear bombs</li>
+                    <li>Frequency: Varies from several per day during solar maximum to less than one per week at minimum</li>
+                    <li>Duration: Typically last from minutes to hours</li>
+                    <li>Effects: Can cause radio blackouts and disrupt satellite communications immediately</li>
                 </ul>
-                <p>Satellite operators monitor space weather to protect their assets and maintain services.</p>
+                <p>The X-ray and UV radiation from flares ionizes Earth's upper atmosphere, affecting radio wave propagation and GPS accuracy.</p>
                 <div class="fact-box">
-                    <h4>Impact</h4>
-                    <p>In 2022, SpaceX lost 40 Starlink satellites due to a geomagnetic storm that increased atmospheric drag.</p>
+                    <h4>EXAMPLE</h4>
+                    <p>An X-class flare can increase ionization in Earth's ionosphere within minutes, causing complete radio blackouts on the sunlit side of Earth. These blackouts can last from minutes to hours depending on flare intensity.</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span>🌍</span> Geomagnetic Storms</h2>
-                <p>When solar material interacts with Earth's magnetic field, it can cause geomagnetic storms:</p>
+                <h2><span>💨</span> Solar Wind</h2>
+                <p>Solar wind is a continuous stream of charged particles (primarily electrons and protons) flowing outward from the Sun's corona in all directions. This plasma carries the Sun's magnetic field throughout the solar system.</p>
                 <ul>
-                    <li>G1 (Minor) - Small power grid fluctuations, minor impact on satellites</li>
-                    <li>G2 (Moderate) - High-latitude power systems affected, increased drag on satellites</li>
-                    <li>G3 (Strong) - Voltage corrections needed, satellite navigation issues</li>
-                    <li>G4 (Severe) - Widespread voltage problems, satellite tracking issues</li>
-                    <li>G5 (Extreme) - Complete grid collapse possible, satellites may be disabled</li>
+                    <li>Composition: Mostly hydrogen and helium ions with embedded magnetic fields</li>
+                    <li>Speed: Typically 400 km/s (slow wind) to 800 km/s (fast wind)</li>
+                    <li>Temperature: Approximately 100,000 to 800,000 degrees Celsius</li>
+                    <li>Density: Very tenuous, about 5-10 particles per cubic centimeter at Earth</li>
+                    <li>Interaction: Compresses Earth's magnetosphere on the day side</li>
+                    <li>Variability: Speed and density fluctuate based on solar activity</li>
                 </ul>
+                <p>When solar wind interacts with Earth's magnetic field, it transfers energy that can drive geomagnetic storms and create auroras at high latitudes.</p>
                 <div class="fact-box">
-                    <h4>Historical Event</h4>
-                    <p>The Carrington Event of 1859 was so powerful that telegraph systems failed and auroras were seen near the equator.</p>
+                    <h4>PROTECTION</h4>
+                    <p>Earth's magnetic field acts as a shield, deflecting most solar wind particles around the planet. Without this protection, solar wind would gradually strip away our atmosphere, as has happened on Mars.</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span>📡</span> Radio Communication</h2>
-                <p>Space weather significantly impacts radio communications:</p>
+                <h2><span>🌊</span> Coronal Mass Ejections (CMEs)</h2>
+                <p>Coronal Mass Ejections are massive bursts of plasma and magnetic field from the Sun's corona. A single CME can eject billions of tons of material into space at speeds ranging from 250 to 3000 km/s.</p>
                 <ul>
-                    <li>Solar flares can cause radio blackouts on the sunlit side of Earth</li>
-                    <li>Ionospheric disturbances affect HF (shortwave) radio propagation</li>
-                    <li>GPS signals can experience degradation during solar storms</li>
-                    <li>Polar routes are particularly vulnerable to communication disruptions</li>
+                    <li>Mass: Typically eject 1-10 billion tons of solar material</li>
+                    <li>Travel Time: Earth-directed CMEs arrive in 15-18 hours (fast) to 2-4 days (slow)</li>
+                    <li>Structure: Contain twisted magnetic field lines and dense plasma clouds</li>
+                    <li>Frequency: More common during solar maximum (3-5 per day vs. 1 per week at minimum)</li>
+                    <li>Size: Can span a region larger than the Sun itself</li>
+                    <li>Direction: Only those directed toward Earth pose a threat to our planet</li>
                 </ul>
-                <p>Aviation, maritime, and emergency services rely on space weather forecasts to plan operations.</p>
+                <p>CMEs are the primary driver of severe space weather at Earth. When a CME's magnetic field connects with Earth's, it can trigger intense geomagnetic storms.</p>
                 <div class="fact-box">
-                    <h4>Practical Effect</h4>
-                    <p>During solar events, airlines may reroute polar flights to maintain communication and reduce radiation exposure.</p>
+                    <h4>MAJOR EVENT</h4>
+                    <p>The July 2012 "Carrington-class" CME narrowly missed Earth. If it had hit, it could have caused up to $2 trillion in damage and taken 4-10 years to fully recover from the infrastructure damage.</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span>🌠</span> Auroras</h2>
-                <p>Auroras (Northern and Southern Lights) are beautiful visual displays caused by space weather:</p>
+                <h2><span>🧲</span> Geomagnetic Storms</h2>
+                <p>Geomagnetic storms occur when solar wind and CMEs disturb Earth's magnetosphere, causing variations in the planet's magnetic field. These storms can last from hours to several days.</p>
                 <ul>
-                    <li>Charged particles from the Sun collide with Earth's atmosphere</li>
-                    <li>These particles are guided by Earth's magnetic field toward the poles</li>
-                    <li>Different gases produce different colors (green, red, purple)</li>
-                    <li>The Kp index measures geomagnetic activity and predicts auroral visibility</li>
+                    <li>Cause: Triggered when southward-pointing magnetic fields from the Sun reconnect with Earth's northward field</li>
+                    <li>G-Scale: Rated from G1 (minor) to G5 (extreme) based on intensity</li>
+                    <li>Ring Current: Enhanced by injected particles creating stronger magnetic disturbances</li>
+                    <li>Duration: Main phase lasts hours to days, recovery phase can extend for days</li>
+                    <li>Global Effect: Impact felt worldwide, strongest at high latitudes</li>
+                    <li>Substorms: Shorter duration disturbances that occur during storms</li>
                 </ul>
-                <p>During strong geomagnetic storms, auroras can be seen at much lower latitudes than normal.</p>
+                <p>During geomagnetic storms, electric currents flow in the ionosphere and magnetosphere, inducing currents in power grids and pipelines on Earth's surface.</p>
                 <div class="fact-box">
-                    <h4>Viewing Tip</h4>
-                    <p>The best time to see auroras is typically around midnight, away from city lights, during periods of high solar activity.</p>
+                    <h4>HISTORICAL IMPACT</h4>
+                    <p>The March 1989 geomagnetic storm caused the collapse of Quebec's power grid in 90 seconds, leaving 6 million people without electricity for 9 hours. Transformers were damaged, and auroras were visible as far south as Texas.</p>
                 </div>
             </div>
 
             <div class="card">
-                <h2><span>☄️</span> Cosmic Radiation</h2>
-                <p>Cosmic rays are high-energy particles originating from outside our solar system:</p>
+                <h2><span>🌈</span> Auroras (Northern & Southern Lights)</h2>
+                <p>Auroras are luminous atmospheric phenomena caused by solar wind particles colliding with gases in Earth's upper atmosphere. They typically occur in oval-shaped zones around the magnetic poles.</p>
                 <ul>
-                    <li>Galactic cosmic rays come from outside our solar system</li>
-                    <li>Solar cosmic rays are emitted by the Sun during flares</li>
-                    <li>Earth's atmosphere and magnetic field provide protection</li>
-                    <li>Radiation levels increase during solar minimum periods</li>
+                    <li>Mechanism: Charged particles guided by Earth's magnetic field collide with oxygen and nitrogen</li>
+                    <li>Colors: Green (oxygen at 100-300 km), red (oxygen above 300 km), blue/purple (nitrogen)</li>
+                    <li>Altitude: Occur between 80-500 km above Earth's surface</li>
+                    <li>Auroral Oval: Expands equatorward during geomagnetic storms</li>
+                    <li>Visibility: Normally confined to polar regions, visible at lower latitudes during storms</li>
+                    <li>Names: Aurora Borealis (Northern Hemisphere), Aurora Australis (Southern Hemisphere)</li>
                 </ul>
-                <p>This radiation poses challenges for astronauts, high-altitude aviation, and satellite electronics.</p>
+                <p>Auroras serve as visible indicators of space weather activity. The intensity and geographic extent correlate with the strength of geomagnetic disturbances.</p>
                 <div class="fact-box">
-                    <h4>Health Impact</h4>
-                    <p>Airline crew members receive more cosmic radiation exposure than nuclear power plant workers, making them classified as radiation workers in some countries.</p>
+                    <h4>OBSERVATION</h4>
+                    <p>The Kp index measures geomagnetic activity on a 0-9 scale. At Kp 5-6, auroras may be visible from northern US states. At Kp 9 (extreme storms), auroras have been observed from tropical latitudes.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span>📡</span> Impacts on Technology</h2>
+                <p>Modern technological systems are increasingly vulnerable to space weather effects. Understanding these impacts is crucial for protecting critical infrastructure and maintaining service continuity.</p>
+                <ul>
+                    <li>Satellites: Radiation damage to electronics, orbit changes due to atmospheric drag, charging effects</li>
+                    <li>Power Grids: Geomagnetically induced currents (GICs) can damage transformers</li>
+                    <li>GPS/GNSS: Positioning errors increase from meters to tens of meters during storms</li>
+                    <li>Radio Communications: HF radio blackouts, signal scintillation and degradation</li>
+                    <li>Aviation: Increased radiation exposure on polar routes, communication disruptions</li>
+                    <li>Pipelines: Corrosion acceleration due to induced electrical currents</li>
+                </ul>
+                <p>The economic impact of severe space weather events can reach billions of dollars through service disruptions, equipment damage, and recovery costs.</p>
+                <div class="fact-box">
+                    <h4>MODERN VULNERABILITY</h4>
+                    <p>In 2022, a geomagnetic storm caused SpaceX to lose 40 newly launched Starlink satellites worth over $50 million. The storm increased atmospheric density, creating unexpected drag that prevented the satellites from reaching their operational orbits.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><span>🛡️</span> Monitoring & Protection</h2>
+                <p>Space weather monitoring has become essential for modern society. Multiple agencies worldwide track solar activity and provide forecasts to help mitigate potential impacts.</p>
+                <ul>
+                    <li>Spacecraft: SOHO, SDO, DSCOVR, and others monitor the Sun continuously</li>
+                    <li>Ground Networks: Magnetometers and ionosondes measure local space weather effects</li>
+                    <li>Forecasting: NOAA Space Weather Prediction Center issues alerts and warnings</li>
+                    <li>Warning Time: 15-60 minutes for CME impacts (from DSCOVR at L1 point)</li>
+                    <li>Mitigation: Operators can put satellites in safe mode, reroute flights, adjust power grid loads</li>
+                    <li>Research: Ongoing efforts to improve prediction accuracy and warning lead times</li>
+                </ul>
+                <p>International cooperation is essential, with data sharing among space agencies, research institutions, and operational centers worldwide to provide comprehensive space weather services.</p>
+                <div class="fact-box">
+                    <h4>PREPAREDNESS</h4>
+                    <p>The US National Space Weather Strategy and Action Plan coordinates efforts across government agencies to improve prediction, mitigation, and response capabilities. Similar initiatives exist in Europe, Japan, and other technologically advanced nations.</p>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Compact Audio Player -->
+    <div class="audio-player">
+        <button class="player-btn" id="playPauseBtn" title="Play/Pause">🔊</button>
+        <button class="player-btn" id="skipBtn" title="Skip">⏭</button>
     </div>
 
     <!-- Chat Widget -->
@@ -498,7 +761,7 @@
 
         <div class="chat-popup" id="chatPopup">
             <div class="chat-header">
-                <h3>💬 Space Weather Assistant</h3>
+                <h3>💬 Space Assistant</h3>
                 <button class="close-btn" onclick="toggleChat()">×</button>
             </div>
 
@@ -525,6 +788,84 @@
     </div>
 
     <script>
+        // Create animated stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 3 + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // Audio Player Logic
+        const audioTracks = [
+            'track1.mp3',
+            'track2.mp3',
+            'track3.mp3'
+        ];
+
+        let currentTrackIndex = 0;
+        let audio = new Audio();
+        let isMuted = false;
+
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const skipBtn = document.getElementById('skipBtn');
+
+        // Load first track
+        function loadTrack(index) {
+            currentTrackIndex = index;
+            audio.src = audioTracks[index];
+        }
+
+        // Initialize
+        loadTrack(0);
+        audio.loop = false;
+        audio.volume = 0.5;
+
+        // Play/Pause and Mute/Unmute toggle
+        playPauseBtn.onclick = () => {
+            if (audio.paused) {
+                audio.play();
+                playPauseBtn.textContent = '🔊';
+                isMuted = false;
+            } else {
+                if (isMuted) {
+                    audio.muted = false;
+                    playPauseBtn.textContent = '🔊';
+                    isMuted = false;
+                } else {
+                    audio.muted = true;
+                    playPauseBtn.textContent = '🔇';
+                    isMuted = true;
+                }
+            }
+        };
+
+        // Skip to next track
+        skipBtn.onclick = () => {
+            currentTrackIndex = (currentTrackIndex + 1) % audioTracks.length;
+            loadTrack(currentTrackIndex);
+            if (!audio.paused || isMuted) {
+                audio.play();
+            }
+        };
+
+        // Auto-play next track when current ends
+        audio.addEventListener('ended', () => {
+            currentTrackIndex = (currentTrackIndex + 1) % audioTracks.length;
+            loadTrack(currentTrackIndex);
+            audio.play();
+        });
+
+        // Start playing on page load
+        audio.play().catch(() => {
+            // Autoplay might be blocked by browser
+            playPauseBtn.textContent = '▶️';
+        });
+
+        // Chat Logic
         const chatPopup = document.getElementById('chatPopup');
         const chat = document.getElementById('chat');
         const messageInput = document.getElementById('messageInput');
@@ -594,9 +935,10 @@
                 console.error("Error sending message:", err);
                 
                 const liError = document.createElement('li');
-                liError.textContent = '❌ Could not connect to server';
+                liError.textContent = '⚠ Could not connect to server';
                 liError.classList.add('server-msg');
-                liError.style.color = '#e74c3c';
+                liError.style.color = '#ff6b6b';
+                liError.style.borderColor = '#ff6b6b';
                 chat.appendChild(liError);
                 
                 chat.scrollTop = chat.scrollHeight;

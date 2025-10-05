@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from huggingface_hub import InferenceClient
 from flask_cors import CORS
 import json
 import time
 
-INFO_PATH = 'hackathon\\hackathon-sstorytelling\\info.json'
-TOKEN_PATH = 'hackathon\\hackathon-sstorytelling\\api.json'
+INFO_PATH = 'hackathon-sstorytelling\\api.json'
+TOKEN_PATH = 'hackathon-sstorytelling\\api.json'
 MIN_TIME = 3
 MAX_USAGE = 15
 MODEL = "meta-llama/Llama-3.2-1B-Instruct"
